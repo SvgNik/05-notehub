@@ -14,10 +14,3 @@ export interface CreateNoteData {
   content: string;
   tag: NoteTag;
 }
-
-export interface FetchNotesResponse {
-  notes: Note[];
-  totalPages: number;
-  page: number;
-  perPage: number;
-}

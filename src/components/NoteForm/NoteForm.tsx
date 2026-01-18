@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import type { FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createNote } from "../../services/noteService";
 import type { CreateNoteData } from "../../types/note";
 import css from "./NoteForm.module.css";
 
 interface NoteFormProps {
-  onSubmit: (values: CreateNoteData) => void;
   onCancel: () => void;
 }
 
@@ -26,12 +28,25 @@ const initialValues: CreateNoteData = {
   tag: "Todo",
 };
 
-const NoteForm = ({ onSubmit, onCancel }: NoteFormProps) => {
+const NoteForm = ({ onCancel }: NoteFormProps) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      onCancel();
+    },
+    onError: (err: any) => {
+      alert(`Error creating note: ${err.message}`);
+    },
+  });
+
   const handleSubmit = (
     values: CreateNoteData,
     { resetForm }: FormikHelpers<CreateNoteData>,
   ) => {
-    onSubmit(values);
+    mutation.mutate(values);
     resetForm();
   };
 
@@ -41,7 +56,7 @@ const NoteForm = ({ onSubmit, onCancel }: NoteFormProps) => {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ isSubmitting }) => (
+      {() => (
         <Form className={css.form}>
           <div className={css.formGroup}>
             <label htmlFor="title" className={css.label}>
@@ -94,9 +109,9 @@ const NoteForm = ({ onSubmit, onCancel }: NoteFormProps) => {
             <button
               type="submit"
               className={css.submitButton}
-              disabled={isSubmitting}
+              disabled={mutation.isPending}
             >
-              Create
+              {mutation.isPending ? "Creating..." : "Create"}
             </button>
           </div>
         </Form>

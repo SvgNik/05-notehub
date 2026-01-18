@@ -20,10 +20,12 @@ const Modal = ({ children, onClose, isOpen }: ModalProps) => {
 
     if (isOpen) {
       window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "auto";
     };
   }, [isOpen, onClose]);
 
