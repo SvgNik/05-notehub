@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteNote } from "../../services/noteService";
 import type { Note } from "../../types/note";
@@ -16,7 +15,7 @@ const NoteList = ({ notes }: NoteListProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       alert(`Error deleting note: ${err.message}`);
     },
   });
